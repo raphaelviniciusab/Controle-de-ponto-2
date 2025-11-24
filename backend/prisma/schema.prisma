@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/client/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Type {
+  IN
+  PAUSE
+  RESUME
+  RETURN
+  OUT
+}
+
+model User {
+  id             Int         @id @default(autoincrement())
+  name           String
+  email          String      @unique
+  password       String
+  role           String      @default("USER")
+  cpf            String?
+  cargo          String?
+  horarioPadrao  String?
+  status         String      @default("ATIVO")
+  entries        TimeEntry[]
+}
+
+model TimeEntry {
+  id        Int      @id @default(autoincrement())
+  timestamp DateTime
+  type      Type
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}
