@@ -11,9 +11,24 @@ const reportRoutes = require('./routes/reportRoutes');
 const app = express();
 
 // Configuração CORS para permitir requisições do frontend
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'], // URLs do frontend Vite
-  credentials: true, // Permite envio de cookies
+  origin: (origin, callback) => {
+    // Permite requisições sem origin (mobile apps, Postman, etc)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
 }));
 
 app.use(express.json());
